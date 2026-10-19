@@ -21,7 +21,16 @@ This lab accompanies the Week 4 notes, [*Data Wrangling I - Loading, Cleaning an
 - [ ] For each of the files, display the first few rows of the file.
 
 ::: {.solution}
+```{r}
+library(tidyverse)
+data1 <- read_csv("data/part1/data1.csv", show_col_types = FALSE)
+data2 <- read_delim("data/part1/data2.txt", delim="\t", show_col_types = FALSE)
+data3 <- read_delim("data/part1/data3", delim=";", show_col_types = FALSE)
 
+head(data1)
+head(data2)
+head(data3)
+```
 :::
 
 ### Task 1b: Checking Loaded Data
@@ -37,7 +46,9 @@ The file `data3` contains information about books in a bookshop.
 - [ ] `readr` also has a function called `read_csv2`, which reads files that use `;` as a delimiter. Try loading `data3` with `read_csv2` instead. Compare the `PriceUSD` and `AvgRating` columns to the raw file. What has gone wrong?
 
 ::: {.solution}
+```{r}
 
+```
 :::
 
 The file `data1.csv` contains student scores from two tests, with their average.
@@ -104,12 +115,21 @@ Try to format your code nicely so it is readable.
 
 
 ::: {.solution}
-
+```{r}
+diamonds |>
+  mutate(volume = x * y *z)
+diamonds <- diamonds |>
+  mutate(volume = x * y *z)
+```
 :::
 
 - [ ] Create a `tibble` containing only the numeric columns of `diamonds`. (Hint: look at the tidyselect callout in the notes.)
 
 ::: {.solution}
+```{r}
+diamonds |>
+  select(depth, table, price, x, y, z, volume)
+```
 
 :::
 
@@ -124,6 +144,12 @@ Now answer the following research questions.
 - [ ] Create a `tibble` containing diamonds that are "unusually" large (having volume more than three standard deviations from the mean volume)?
 
 ::: {.solution}
+```{r}
+diamonds |>
+  mutate(mean_price = mean(price)) |>
+  arrange(desc(price)) |>
+  
+```
 
 :::
 
