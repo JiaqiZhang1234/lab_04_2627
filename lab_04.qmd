@@ -23,14 +23,14 @@ This lab accompanies the Week 4 notes, [*Data Wrangling I - Loading, Cleaning an
 ::: {.solution}
 ```{r}
 library(tidyverse)
-data1 <- read_csv("data/part1/data1.csv", show_col_types = FALSE)
-data2 <- read_delim("data/part1/data2.txt", delim="\t", show_col_types = FALSE)
-data3 <- read_delim("data/part1/data3", delim=";", show_col_types = FALSE)
-
+data1 <- read_csv("data/part1/data1.csv", show_col_types = FALSE)  
 head(data1)
+data2 <- read_tsv("data/part1/data2.txt", show_col_types = FALSE) 
 head(data2)
+data3 <- read_delim("data/part1/data3", delim = ";", show_col_types = FALSE) 
 head(data3)
 ```
+
 :::
 
 ### Task 1b: Checking Loaded Data
@@ -47,8 +47,9 @@ The file `data3` contains information about books in a bookshop.
 
 ::: {.solution}
 ```{r}
-
+read_delim("data/part1/data3", delim = ";", col_types = cols(ISBN = col_character()))
 ```
+
 :::
 
 The file `data1.csv` contains student scores from two tests, with their average.
@@ -58,6 +59,20 @@ The file `data1.csv` contains student scores from two tests, with their average.
 - [ ] Look at the row for Henry Zhao. Are his scores really `0`? What happens to the mean of `score1` and of `average` if he is excluded?
 
 ::: {.solution}
+```{r}
+data1
+data1 |> summarise(
+  mean_score1 = mean(score1, na.rm = TRUE)
+) 
+
+data1 |>
+  filter(name != "Henry Zhao") |>
+  summarise(
+    mean_score1 = mean(score1, na.rm = TRUE),
+    mean_average = mean(average, na.rm = TRUE)
+  )
+  
+```
 
 :::
 
@@ -66,12 +81,25 @@ The file `data2.txt` contains readings from air quality monitoring stations.
 - [ ] Create a `tibble` containing only `station_id` and the particulate matter readings (the columns measured in µg/m³). Use a tidyselect helper rather than typing out the column names.
 
 ::: {.solution}
+```{r}
+data2 |>
+  select(station_id, ends_with("_ug_m3"))
+  
+```
 
 :::
 
 - [ ] How many readings are there in the file, and from how many different neighbourhoods? (Hint: look at the "Other Summarise Functions" tip in the notes.)
 
 ::: {.solution}
+```{r}
+data2 |>
+  summarise(
+    n_reading = n(),
+    n_neighbourhoods = n_distinct(neighborhood)
+  )
+
+```
 
 :::
 
@@ -79,6 +107,22 @@ The file `data2.txt` contains readings from air quality monitoring stations.
 - [ ] Compute the mean `pm2_5_ug_m3` over all readings, and over only the readings with status `OK`. Which would you report, and why?
 
 ::: {.solution}
+```{r}
+data2 |>
+  filter(status != "OK") |>
+  select(station_id, neighborhood, pm2_5_ug_m3, pm10_ug_m3, sensor_uptime_pct, status)
+
+data2 |>
+  filter(status == "OK") |>
+  summarise(
+    mean_OK_pm2_5_ug_m3 = mean(pm2_5_ug_m3, na.rm = TRUE)
+  )
+
+data2 |>
+  summarise(
+    mean_pm2_5_ug_m3 = mean(pm2_5_ug_m3, na.rm = TRUE)
+  )
+```
 
 :::
 
@@ -116,11 +160,11 @@ Try to format your code nicely so it is readable.
 
 ::: {.solution}
 ```{r}
-diamonds |>
-  mutate(volume = x * y *z)
 diamonds <- diamonds |>
-  mutate(volume = x * y *z)
+  mutate(volume = x * y * z)
+diamonds1
 ```
+
 :::
 
 - [ ] Create a `tibble` containing only the numeric columns of `diamonds`. (Hint: look at the tidyselect callout in the notes.)
@@ -128,7 +172,8 @@ diamonds <- diamonds |>
 ::: {.solution}
 ```{r}
 diamonds |>
-  select(depth, table, price, x, y, z, volume)
+  select(where(is.numeric))
+
 ```
 
 :::
@@ -146,9 +191,15 @@ Now answer the following research questions.
 ::: {.solution}
 ```{r}
 diamonds |>
-  mutate(mean_price = mean(price)) |>
+  summarise(
+    average_price = mean(price)
+  ) 
+diamonds |>
   arrange(desc(price)) |>
-  
+  select(price, volume) |>
+  head(5)
+
+
 ```
 
 :::
